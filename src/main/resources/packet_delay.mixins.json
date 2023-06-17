@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "com.agentkosticka.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+      "C2SPacketDelayMixinMain",
+	  "S2CPacketDelayMixinMain"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

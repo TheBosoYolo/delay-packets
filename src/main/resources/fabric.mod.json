@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "packet-delay",
+	"version": "${version}",
+	"name": "Packet Delay",
+	"description": "This mod allows you to delay any incoming/outgoing packets. Usefull for debugging plugins on high ping client",
+	"authors": [
+		"Agent Kosticka",
+		"With the help of ChatGPT"
+	],
+	"contact": {
+		"homepage": "nop",
+		"sources": "idk"
+	},
+	"license": "Do i look like i have a licence?",
+	"icon": "assets/packet-delay/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+          "com.agentkosticka.PackedDelay"
+		],
+		"client": [
+			"com.agentkosticka.PacketDelayClient"
+		],
+		"fabric-datagen": [
+			"com.agentkosticka.PacketDelayDataGenerator"
+		]
+	},
+	"mixins": [
+      "packet_delay.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.19",
+		"minecraft": "~1.19.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
