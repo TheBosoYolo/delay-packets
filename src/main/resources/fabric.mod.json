@@ -9,8 +9,8 @@
 		"With the help of ChatGPT"
 	],
 	"contact": {
-		"homepage": "nop",
-		"sources": "idk"
+		"homepage": "https://modrinth.com/mod/delay-packets",
+		"sources": "https://github.com/TheBosoYolo/delay-packets/"
 	},
 	"license": "Do i look like i have a licence?",
 	"icon": "assets/packet-delay/icon.png",
