@@ -3,31 +3,22 @@ package com.agentkosticka;
 import com.agentkosticka.event.KeyInputHandlerer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.*;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-
-import java.util.*;
+import java.util.ArrayList;
 
 public class S2CPacketStoreNRun {
-    public static List<Object> allDelayedS2CPackets = new ArrayList<>();
-    public void HandlePacket(Object packet, CallbackInfo ci){
-        if(KeyInputHandlerer.saveAndRemoveS2C){
-            sendAllS2CPackets();
-            ci.cancel();
+    public static void releaseS2CPackets(MinecraftClient client){
+        if(KeyInputHandlerer.interceptedS2CPackets.isEmpty()){
+            return;
         }
-    }
-
-    public static void sendAllS2CPackets(){
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        ClientPlayNetworkHandler networkHandler = minecraftClient.getNetworkHandler();
+        ClientPlayNetworkHandler networkHandler = client.getNetworkHandler();
         if (networkHandler == null){
             return;
         }
-        for (Object delayedPacket: allDelayedS2CPackets) {
+        for (Packet<?> delayedPacket: KeyInputHandlerer.interceptedS2CPackets) {
            if(delayedPacket instanceof GameJoinS2CPacket){
                 networkHandler.onGameJoin((GameJoinS2CPacket) delayedPacket);
            } else if(delayedPacket instanceof EntitySpawnS2CPacket){
@@ -243,8 +234,6 @@ public class S2CPacketStoreNRun {
            } else if(delayedPacket instanceof BundleS2CPacket){
                networkHandler.onBundle((BundleS2CPacket) delayedPacket);
            }
-           //Anal gay needs something else
-
         }
     }
 }

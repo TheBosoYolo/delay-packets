@@ -1,185 +1,200 @@
 package com.agentkosticka.event;
 
 import com.agentkosticka.clone.CloneMaster;
-import io.netty.buffer.Unpooled;
+import com.agentkosticka.modmenu.ConfigValues;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
 import org.lwjgl.glfw.GLFW;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.agentkosticka.S2CPacketStoreNRun.allDelayedS2CPackets;
-import static com.agentkosticka.S2CPacketStoreNRun.sendAllS2CPackets;
+import static com.agentkosticka.S2CPacketStoreNRun.releaseS2CPackets;
 
 public class KeyInputHandlerer {
     public static final String KEY_CATEGORY = "key.delaypackets.category.delaypackets";
     public static final String KEY_DELAY_OUTGOING = "key.delaypackets.keybind.delayoutgoing";
     public static final String KEY_DELAY_INCOMING = "key.delaypackets.keybind.delayincoming";
-    public static final String KEY_DELAY_DISABLEDEATH = "key.delaypackets.keybind.disabledeath";
     public static final String KEY_DELAY_DISABLEBU = "key.delaypackets.keybind.disablebu";
     public static final String KEY_DELAY_DISABLEEU = "key.delaypackets.keybind.disableeu";
 
+    public static List<Packet<?>> interceptedC2SPackets = new ArrayList<>();
+    public static List<Packet<?>> interceptedS2CPackets = new ArrayList<>();
+
     public static KeyBinding delayOut;
     public static KeyBinding delayIn;
-    public static KeyBinding disableDeath;
     public static KeyBinding disableBU;
     public static KeyBinding disableEU;
-    public static boolean disableDeathScreen = false;
-    public static boolean disableBlockUpdate = false;
-    public static boolean disableEntityUpdate = false;
-    public static List<Packet<?>> interceptedC2SPackets = new ArrayList<>();
-    private static boolean wasItPressedC2S = false;
-    private static boolean wasItReleasedC2S = true;
 
-    public static boolean saveAndRemoveC2S = false;
+    public static boolean holdBUPackets = false;
+    public static boolean holdEUPackets = false;
+    public static boolean holdC2SPackets = false;
 
-    private static boolean delayC2S = false;
-    public static List<Packet<?>> interceptedS2CPackets = new ArrayList<>();
-    private static boolean wasItPressedS2C = false;
-    private static boolean wasItReleasedS2C = true;
-
-    public static boolean saveAndRemoveS2C = false;
-
-    private static boolean delayS2C = false;
+    public static boolean holdS2CPackets = false;
 
     public static void registerKeyInputs(){
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client == null || client.player == null){
-               return;
-            }
-            if (delayOut.isPressed()) {
-                if (wasItReleasedC2S){
-                    sendMessage("info.delaypackets.message.start.s2c", true);
-                    CloneMaster.summonClone();
-                    //start noting all outgoing (C2S) packets, save them to a list and cancel their send requests
-                    startListingC2S = true;
-                    wasItReleasedC2S = false;
-                }
-                wasItPressedC2S = true;
-            }
-            else if (wasItPressedC2S){
-                sendMessage("info.delaypackets.message.stop.s2c", true);
-                CloneMaster.destroyClone();
-                //send all saved packets at once
-                startListingC2S = false;
-                wasItPressedC2S = false;
-                wasItReleasedC2S = true;
-            }
-            else{
-                wasItReleasedC2S = true;
-            }
-            delayC2SPackets(client);
-            if (disableBU.wasPressed()){
-                disableBlockUpdate = !disableBlockUpdate;
-                if (disableBlockUpdate) {
-                    sendMessage("info.delaypackets.message.stop.bu", true);
-                } else {
-                    sendMessage("info.delaypackets.message.start.bu", true);
-                }
-            }
-            if (disableEU.wasPressed()){
-                disableEntityUpdate = !disableEntityUpdate;
-                if (disableEntityUpdate) {
-                    sendMessage("info.delaypackets.message.stop.eu", true);
-                } else {
-                    sendMessage("info.delaypackets.message.start.eu", true);
-                }
-            }
-            if (disableDeath.wasPressed()){
-                disableDeathScreen = !disableDeathScreen;
-                if (disableDeathScreen) {
-                    sendMessage("info.delaypackets.message.stop.death", true);
-                } else {
-                    sendMessage("info.delaypackets.message.start.death", true);
-                }
-            }
-            if (delayIn.isPressed()) {
-                if (wasItReleasedS2C){
-                    sendMessage("info.delaypackets.message.start.c2s", true);
-                    //start noting all outgoing (S2C) packets, save them to a list and cancel their send requests
-                    startListingS2C = true;
-                    wasItReleasedS2C = false;
-                }
-                wasItPressedS2C = true;
-            }
-            else if (wasItPressedS2C){
-                sendMessage("info.delaypackets.message.stop.c2s", true);
-                //send all saved packets at once
-                startListingS2C = false;
-                wasItPressedS2C = false;
-                wasItReleasedS2C = true;
-            }
-            else{
-                wasItReleasedS2C = true;
-            }
-            delayS2CPackets(client);
-        });
-    }
-
-
-
-
-    private static boolean startListingC2S = false;
-    private static void delayC2SPackets(MinecraftClient client){
-        if (startListingC2S){
-            saveAndRemoveC2S = true;
-        }
-        else {
-            if(interceptedC2SPackets.isEmpty()){
                 return;
             }
-            saveAndRemoveC2S = false;
-            for (Packet<?> packet: interceptedC2SPackets) {
-                try{
-                    client.getNetworkHandler().sendPacket(packet);
+            switch (ConfigValues.delayOutgoing){
+                case HOLD -> {
+                    if(holdC2SPackets != delayOut.isPressed()) {
+                        holdC2SPackets = delayOut.isPressed();
+
+                        if(holdC2SPackets) {
+                            sendMessage("info.delaypackets.message.start.c2s", true);
+                            CloneMaster.summonClone();
+                        }
+                        else {
+                            sendMessage("info.delaypackets.message.stop.c2s", true);
+                            CloneMaster.destroyClone();
+                        }
+                        releaseC2SPackets(client);
+                    }
                 }
-                catch (Exception e){
-                    sendMessage("An error occurred when sending a packet! Error: "+e);
+                case TOGGLE -> {
+                    if(delayOut.wasPressed()){
+                        holdC2SPackets = !holdC2SPackets;
+
+                        if(holdC2SPackets) {
+                            sendMessage("info.delaypackets.message.start.c2s", true);
+                            CloneMaster.summonClone();
+                        }
+                        else {
+                            sendMessage("info.delaypackets.message.stop.c2s", true);
+                            CloneMaster.destroyClone();
+                        }
+                        releaseC2SPackets(client);
+                    }
                 }
             }
-            interceptedC2SPackets = new ArrayList<>();
-        }
+            switch (ConfigValues.delayIncoming){
+                case HOLD -> {
+                    if(holdS2CPackets != delayIn.isPressed()) {
+                        holdS2CPackets = delayIn.isPressed();
+
+                        if (holdC2SPackets) {
+                            sendMessage("info.delaypackets.message.start.s2c", true);
+                        } else {
+                            sendMessage("info.delaypackets.message.stop.s2c", true);
+                        }
+                        releaseS2CPackets(client);
+                    }
+                }
+                case TOGGLE -> {
+                    if(delayIn.wasPressed()){
+                        holdS2CPackets = !holdS2CPackets;
+
+                        if(holdS2CPackets){
+                            sendMessage("info.delaypackets.message.start.s2c", true);
+                        }
+                        else {
+                            sendMessage("info.delaypackets.message.stop.s2c", true);
+                        }
+                        releaseS2CPackets(client);
+                    }
+                    if ((client.player.isDead() || !client.player.isAlive()) && holdS2CPackets){
+                        sendMessage("info.delaypackets.message.stop.s2c", true);
+                        holdS2CPackets = false;
+                        releaseS2CPackets(client);
+                    }
+                }
+            }
+            switch (ConfigValues.delayBU){
+                case HOLD -> {
+                    if(disableBU.isPressed()) {
+                        holdBUPackets = !holdBUPackets;
+
+                        if(holdBUPackets) {
+                            sendMessage("info.delaypackets.message.disabled.bu", true);
+                        }
+                        else {
+                            sendMessage("info.delaypackets.message.enable.bu", true);
+                        }
+                    }
+                }
+                case TOGGLE -> {
+                    if (disableBU.wasPressed()){
+                        holdBUPackets = !holdBUPackets;
+
+                        if (holdBUPackets) {
+                            sendMessage("info.delaypackets.message.disable.bu", true);
+                        } else {
+                            sendMessage("info.delaypackets.message.enable.bu", true);
+                        }
+                    }
+                }
+            }
+            switch (ConfigValues.delayEU){
+                case HOLD -> {
+                    if (disableEU.isPressed()) {
+                        holdEUPackets = !holdEUPackets;
+
+                        if (holdEUPackets) {
+                            sendMessage("info.delaypackets.message.disable.eu", true);
+                        } else {
+                            sendMessage("info.delaypackets.message.enable.eu", true);
+                        }
+                    }
+                }
+                case TOGGLE -> {
+                    if (disableEU.wasPressed()){
+                        holdEUPackets = !holdEUPackets;
+                        if (holdEUPackets) {
+                            sendMessage("info.delaypackets.message.stop.eu", true);
+                        } else {
+                            sendMessage("info.delaypackets.message.start.eu", true);
+                        }
+                    }
+                }
+            }
+        });
     }
-    private static boolean startListingS2C = false;
-    private static void delayS2CPackets(MinecraftClient client) {
-        if (startListingS2C) {
-            saveAndRemoveS2C = true;
-        } else {
-            saveAndRemoveS2C = false;
-            sendAllS2CPackets();
-            allDelayedS2CPackets = new ArrayList<>();
+    private static void releaseC2SPackets(MinecraftClient client) {
+        if (interceptedC2SPackets.isEmpty()) {
+            return;
         }
+        for (Packet<?> packet : interceptedC2SPackets) {
+            try {
+                client.getNetworkHandler().sendPacket(packet);
+            } catch (Exception e) {
+                sendMessage("An error occurred when sending a packet! Error: " + e);
+            }
+        }
+        interceptedC2SPackets = new ArrayList<>();
     }
     public static void sendMessage(String string){
         sendMessage(string, false);
     }
     public static void sendMessage(String string, boolean isItAKey){
-        MinecraftClient client = null;
-        try {
-            client = MinecraftClient.getInstance();
+        if(!ConfigValues.chatFeedback){
+            return;
         }
-        catch (Exception e) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity player = client.player;
+        if(player == null){
             return;
         }
         if(!isItAKey){
-            client.player.sendMessage(Text.of(string));
+            player.sendMessage(Text.of("§9[Delay Packets]§r " + string));
         }
         else{
-            client.player.sendMessage(Text.translatable(string));
+            Text prefix = Text.of("§9[Delay Packets]§r ");
+            Text translatable = Text.translatable(string);
+
+            String prefixJson = Text.Serializer.toJson(prefix);
+            String translatableJson = Text.Serializer.toJson(translatable);
+
+            String joinedJson = "[" + prefixJson + "," + translatableJson + "]";
+            Text joinedText = Text.Serializer.fromJson(joinedJson);
+
+            client.player.sendMessage(joinedText);
         }
     }
     public static void registerMethods(){
@@ -193,12 +208,6 @@ public class KeyInputHandlerer {
                 KEY_DELAY_INCOMING,
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_CAPS_LOCK,
-                KEY_CATEGORY
-        ));
-        disableDeath = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                KEY_DELAY_DISABLEDEATH,
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_HOME,
                 KEY_CATEGORY
         ));
         disableBU = KeyBindingHelper.registerKeyBinding(new KeyBinding(

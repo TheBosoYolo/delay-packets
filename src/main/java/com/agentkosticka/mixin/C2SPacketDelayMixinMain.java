@@ -16,7 +16,7 @@ public class C2SPacketDelayMixinMain {
 
 	@Inject(method = "sendPacket", at = @At("HEAD"), cancellable = true)
 	private void interceptSendPacket(Packet<?> packet, CallbackInfo callbackInfo) {
-		if (KeyInputHandlerer.saveAndRemoveC2S) {
+		if (KeyInputHandlerer.holdC2SPackets) {
 			if(!packet.getClass().equals(KeepAliveC2SPacket.class)){
 				KeyInputHandlerer.interceptedC2SPackets.add(packet);
 				callbackInfo.cancel();

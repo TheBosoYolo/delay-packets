@@ -24,6 +24,9 @@
 		],
 		"fabric-datagen": [
 			"com.agentkosticka.PacketDelayDataGenerator"
+		],
+		"modmenu": [
+			"com.agentkosticka.modmenu.PacketDelayWithModMenu"
 		]
 	},
 	"mixins": [

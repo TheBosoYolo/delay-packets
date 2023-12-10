@@ -1,19 +1,16 @@
 {
   "key.delaypackets.category.delaypackets": "Packet Delay Mod Keybindings",
-  "key.delaypackets.keybind.delayoutgoing": "Delay Outgoing Packets [hold]",
-  "key.delaypackets.keybind.delayincoming" : "Delay Incoming Packets [hold]",
-  "key.delaypackets.keybind.disableeu": "Disable Entity Updates [toggle]",
-  "key.delaypackets.keybind.disablebu" : "Disable Block Updates [toggle]",
-  "key.delaypackets.keybind.disabledeath" : "Disable Death Screen [toggle] [not working atm]",
+  "key.delaypackets.keybind.delayoutgoing": "Delay Outgoing Packets",
+  "key.delaypackets.keybind.delayincoming" : "Delay Incoming Packets",
+  "key.delaypackets.keybind.disableeu": "Disable Entity Updates",
+  "key.delaypackets.keybind.disablebu" : "Disable Block Updates",
 
-  "info.delaypackets.message.stop.c2s": "Stopped canceling incoming packets",
-  "info.delaypackets.message.start.c2s" : "Canceling incoming packets",
-  "info.delaypackets.message.stop.s2c": "Stopped canceling outgoing packets",
-  "info.delaypackets.message.start.s2c" : "Canceling outgoing packets",
-  "info.delaypackets.message.start.death" : "Enabled death screen",
-  "info.delaypackets.message.stop.death" : "Disabled death screen",
-  "info.delaypackets.message.stop.bu" : "Disabled block updates",
-  "info.delaypackets.message.start.bu" : "Enabled block updates",
-  "info.delaypackets.message.stop.eu" : "Disabled entity updates",
-  "info.delaypackets.message.start.eu" : "Enabled entity updates"
+  "info.delaypackets.message.stop.s2c": "§2+§r Stopped canceling incoming packets",
+  "info.delaypackets.message.start.s2c" : "§4-§r Canceling incoming packets",
+  "info.delaypackets.message.stop.c2s": "§2+§r Stopped canceling outgoing packets",
+  "info.delaypackets.message.start.c2s" : "§4-§r Canceling outgoing packets",
+  "info.delaypackets.message.disabled.bu" : "§4-§r Disabled block updates",
+  "info.delaypackets.message.enabled.bu" : "§2+§r Enabled block updates",
+  "info.delaypackets.message.disabled.eu" : "§4-§r Disabled entity updates",
+  "info.delaypackets.message.enabled.eu" : "§2+§r Enabled entity updates"
 }

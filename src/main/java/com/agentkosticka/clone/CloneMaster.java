@@ -1,6 +1,7 @@
 package com.agentkosticka.clone;
 
 
+import com.agentkosticka.modmenu.ConfigValues;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -11,6 +12,9 @@ public class CloneMaster {
     public static CloneEntity clone = null;
 
     public static void summonClone(boolean firstTime) {
+        if(!ConfigValues.showClone){
+            return;
+        }
         destroyClone();
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
