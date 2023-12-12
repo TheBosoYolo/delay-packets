@@ -8,8 +8,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-import java.lang.reflect.Field;
-
 public class CloneEntity extends OtherClientPlayerEntity {
     private boolean isSneaking = false;
     private Box defaultBoundingBox;
