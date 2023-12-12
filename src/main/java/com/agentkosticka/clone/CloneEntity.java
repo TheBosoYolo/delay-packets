@@ -1,19 +1,10 @@
 package com.agentkosticka.clone;
 
-import com.agentkosticka.event.KeyInputHandlerer;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.stat.StatHandler;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -47,11 +38,6 @@ public class CloneEntity extends OtherClientPlayerEntity {
 
         //this.updateLimbs(0.5F);
         this.limbAnimator.updateLimbs(20, 0);
-        //0.6x x 0.6z x 1.7y
-        //xz offset 0.3 0.3
-        double x = localPlayer.getX() - 0.1;
-        double y = localPlayer.getY() - 0.8;
-        double z = localPlayer.getZ() - 0.1;
         defaultBoundingBox = localPlayer.getBoundingBox();
 
         this.bodyYaw = localPlayer.bodyYaw;
