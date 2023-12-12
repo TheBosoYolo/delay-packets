@@ -1,67 +1,119 @@
 package com.agentkosticka.clone;
 
+import com.agentkosticka.event.KeyInputHandlerer;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.stat.StatHandler;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+
+import java.lang.reflect.Field;
 
 public class CloneEntity extends OtherClientPlayerEntity {
     private boolean isSneaking = false;
-    private ClientPlayNetworkHandler networkHandler;
+    private Box defaultBoundingBox;
 
     public CloneEntity(ClientWorld clientWorld, GameProfile gameProfile) {
         super(clientWorld, gameProfile);
         copyDataFromLocalPlayer();
     }
 
-    private void copyDataFromLocalPlayer() {
+    public void copyDataFromLocalPlayer() {
         ClientPlayerEntity localPlayer = MinecraftClient.getInstance().player;
         if (localPlayer != null) {
-            // Copy necessary data from the local player to the clone entity
-            this.copyPositionAndRotation(localPlayer);
-            this.copyFrom(localPlayer);
-
-            this.setFireTicks(localPlayer.getFireTicks());
-            this.setHealth(localPlayer.getHealth());
-            this.setSneaking(localPlayer.isSneaking());
-            this.setSprinting(false);
-            this.noClip = true;
-
-            this.bodyYaw = localPlayer.bodyYaw;
-            this.activeItemStack = localPlayer.getActiveItem();
-            this.capeX = localPlayer.capeX;
-            this.capeY = localPlayer.capeY;
-            this.capeZ = localPlayer.capeZ;
-            this.fallDistance = localPlayer.fallDistance;
-            this.headYaw = localPlayer.headYaw;
-
-            isSneaking = localPlayer.isSneaking();
-            // Add any additional data you want to copy
+            updateDataFromClientPlayer(localPlayer);
         }
     }
+    public void updateDataFromClientPlayer(ClientPlayerEntity localPlayer) {
+        this.copyPositionAndRotation(localPlayer);
+        this.copyFrom(localPlayer);
+
+        this.setFireTicks(localPlayer.getFireTicks());
+        this.setHealth(localPlayer.getHealth());
+        this.setSneaking(localPlayer.isSneaking());
+        this.setSprinting(false);
+        this.noClip = true;
+
+
+        //this.updateLimbs(0.5F);
+        this.limbAnimator.updateLimbs(20, 0);
+        //0.6x x 0.6z x 1.7y
+        //xz offset 0.3 0.3
+        double x = localPlayer.getX() - 0.1;
+        double y = localPlayer.getY() - 0.8;
+        double z = localPlayer.getZ() - 0.1;
+        defaultBoundingBox = localPlayer.getBoundingBox();
+
+        this.bodyYaw = localPlayer.bodyYaw;
+        this.headYaw = localPlayer.headYaw;
+
+        this.activeItemStack = localPlayer.getActiveItem();
+        this.capeX = localPlayer.capeX;
+        this.capeY = localPlayer.capeY;
+        this.capeZ = localPlayer.capeZ;
+        this.fallDistance = localPlayer.fallDistance;
+        isSneaking = localPlayer.isSneaking();
+    }
+
+    @Override
+    public void tick() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        //can you see me?
+        float yaw = mc.player.headYaw % 360;
+        /*while (yaw > 180 || yaw < -180) {
+            yaw -= 360;
+        }*/
+
+        double posDifference = getDistance(this.getPos(), mc.player.getPos());
+        if(posDifference < 1){
+            if(yaw < 45 && yaw > -45){
+                this.setBoundingBox(defaultBoundingBox.offset(0, 0, 2));
+            }
+            else if(yaw < 135 && yaw > 45){
+                this.setBoundingBox(defaultBoundingBox.offset(-2, 0, 0));
+            }
+            else if(yaw < -45 && yaw > -135){
+                this.setBoundingBox(defaultBoundingBox.offset(2, 0, 0));
+            }
+            else{
+                this.setBoundingBox(defaultBoundingBox.offset(0, 0, -2));
+            }
+        }
+        else {
+            this.setBoundingBox(defaultBoundingBox);
+        }
+
+
+        super.tick();
+    }
+    private double getDistance(Vec3d pos1, Vec3d pos2){
+        double x = pos1.x - pos2.x;
+        double z = pos1.z - pos2.z;
+        return Math.sqrt(x*x + z*z);
+    }
+
     @Override
     public boolean isInSneakingPose() {
         return isSneaking;
     }
 
-    public void initialize(ClientPlayNetworkHandler networkHandler, ClientWorld world) {
-        // Set the network handler
-        this.networkHandler = networkHandler;
-
-        // Set the world
-        this.world = world;
-
+    @Override
+    public boolean canBeHitByProjectile() {
+        return false;
     }
 
-
-    public boolean damage(DamageSource source, float amount) {
-        // Prevent the clone entity from taking damage
-        return false;
+    public void initialize(ClientWorld world) {
+        // Set the world
+        this.world = world;
     }
 }

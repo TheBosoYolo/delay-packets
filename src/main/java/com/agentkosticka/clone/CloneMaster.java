@@ -28,15 +28,7 @@ public class CloneMaster {
 
         GameProfile cloneProfile = player.getGameProfile();
         clone = new CloneEntity(world, cloneProfile);
-        clone.initialize(
-                MinecraftClient.getInstance().getNetworkHandler(),
-                world
-        );
-
-        // Set the clone's model to the player's model
-
-        clone.setPos(player.getX(), player.getY(), player.getZ());
-
+        clone.initialize(world);
         // Copy any additional properties or data you want from the player to the clone
 
         world.addEntity(clone.getId(), clone);
@@ -47,7 +39,10 @@ public class CloneMaster {
     }
     public static void summonClone(){
         summonClone(true);
-    };
+    }
+    public static void updateClone(ClientPlayerEntity localPlayer) {
+        clone.updateDataFromClientPlayer(localPlayer);
+    }
     public static void destroyClone() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null && clone != null) {

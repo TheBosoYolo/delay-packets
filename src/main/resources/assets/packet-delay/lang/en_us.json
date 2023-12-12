@@ -1,9 +1,10 @@
 {
-  "key.delaypackets.category.delaypackets": "Packet Delay Mod Keybindings",
-  "key.delaypackets.keybind.delayoutgoing": "Hold Outgoing Packets",
-  "key.delaypackets.keybind.delayincoming" : "Hold Incoming Packets",
-  "key.delaypackets.keybind.disableeu": "Disable Entity Updates",
-  "key.delaypackets.keybind.disablebu" : "Disable Block Updates",
+  "key.delaypackets.category.main": "Packet Delay Mod Keybindings",
+  "key.delaypackets.keybinding.hold.outgoing": "Hold outgoing packets",
+  "key.delaypackets.keybinding.hold.incoming": "Hold incoming packets",
+  "key.delaypackets.keybinding.disable.eu": "Disable entity updates",
+  "key.delaypackets.keybinding.disable.bu": "Disable block updates",
+  "key.delaypackets.keybinding.delay.incoming": "Delay outgoing packets for set duration",
 
   "info.delaypackets.message.stop.s2c": "§2+§r Incoming packets are being processed as normal",
   "info.delaypackets.message.start.s2c" : "§4-§r Incoming packets are being held",

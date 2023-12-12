@@ -3,22 +3,15 @@ package com.agentkosticka.mixin;
 
 import com.agentkosticka.event.KeyInputHandlerer;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.*;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class S2CPacketDelayMixinMain {
-
-    @Shadow protected abstract void playSpawnSound(Entity entity);
-
-    @Shadow public abstract void clearWorld();
-
     @Inject(method = "onGameJoin", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(GameJoinS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
@@ -27,7 +20,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntitySpawn", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntitySpawnS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -39,7 +32,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityVelocityUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityVelocityUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
 
@@ -47,7 +40,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityTrackerUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
 
@@ -60,7 +53,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityPosition", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityPositionS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -72,14 +65,14 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntity", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onEntitySetHeadYaw", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntitySetHeadYawS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -96,7 +89,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onChunkDeltaUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(ChunkDeltaUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
 
@@ -104,28 +97,28 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onChunkData", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(ChunkDataS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onChunkBiomeData", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(ChunkBiomeDataS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onUnloadChunk", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(UnloadChunkS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onBlockUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(BlockUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
 
@@ -162,7 +155,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityAnimation", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityAnimationS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -182,21 +175,21 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityPassengersSet", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityPassengersSetS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onEntityAttach", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityAttachS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
     @Inject(method = "onEntityStatus", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityStatusS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
         /*MinecraftClient client = MinecraftClient.getInstance();
@@ -221,7 +214,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityDamage", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityDamageS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -271,10 +264,10 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onBlockEntityUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(BlockEntityUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
@@ -286,7 +279,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityEquipmentUpdate", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityEquipmentUpdateS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -316,7 +309,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onWorldEvent", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(WorldEventS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
@@ -373,7 +366,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityStatusEffect", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityStatusEffectS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -484,7 +477,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onRemoveEntityStatusEffect", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(RemoveEntityStatusEffectS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -526,7 +519,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onPlaySoundFromEntity", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(PlaySoundFromEntityS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -593,7 +586,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onEntityAttributes", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(EntityAttributesS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdEUPackets){
+        if(KeyInputHandlerer.disableEUPackets){
             ci.cancel();
         }
     }
@@ -615,7 +608,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onChunkLoadDistance", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(ChunkLoadDistanceS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
@@ -627,7 +620,7 @@ public abstract class S2CPacketDelayMixinMain {
     @Inject(method = "onChunkRenderDistanceCenter", at = @At("HEAD"), cancellable = true)
     private void modifyS2CPacket(ChunkRenderDistanceCenterS2CPacket packet, CallbackInfo ci) {
         HandlePacket(packet, ci);
-        if(KeyInputHandlerer.holdBUPackets){
+        if(KeyInputHandlerer.disableBUPackets){
             ci.cancel();
         }
     }
