@@ -68,25 +68,31 @@ public class CloneEntity extends OtherClientPlayerEntity {
     @Override
     public void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
-        //can you see me?
-        float yaw = mc.player.headYaw % 360;
-        /*while (yaw > 180 || yaw < -180) {
+
+        if(mc.player == null){
+            super.tick();
+            return;
+        }
+
+        float yaw = mc.player.headYaw;
+        while (yaw > 180 || yaw < -180) {
             yaw -= 360;
-        }*/
+            mc.player.headYaw -= 360;
+        }
 
         double posDifference = getDistance(this.getPos(), mc.player.getPos());
-        if(posDifference < 1){
+        if(posDifference < 0.9){
             if(yaw < 45 && yaw > -45){
-                this.setBoundingBox(defaultBoundingBox.offset(0, 0, 2));
+                this.setBoundingBox(defaultBoundingBox.offset(0, 0, 1.9).expand(0, 20, 0));
             }
             else if(yaw < 135 && yaw > 45){
-                this.setBoundingBox(defaultBoundingBox.offset(-2, 0, 0));
+                this.setBoundingBox(defaultBoundingBox.offset(-1.9, 0, 0).expand(0, 20, 0));
             }
             else if(yaw < -45 && yaw > -135){
-                this.setBoundingBox(defaultBoundingBox.offset(2, 0, 0));
+                this.setBoundingBox(defaultBoundingBox.offset(1.9, 0, 0).expand(0, 20, 0));
             }
             else{
-                this.setBoundingBox(defaultBoundingBox.offset(0, 0, -2));
+                this.setBoundingBox(defaultBoundingBox.offset(0, 0, -1.9).expand(0, 20, 0));
             }
         }
         else {
